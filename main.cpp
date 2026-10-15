@@ -5,9 +5,10 @@
 #include <tuple>
 #include <string>
 
+// declaring constants
 double pi = std::numbers::pi;
-double G = 2.62 * pow(10, -9);
-float dt = 1000.0f;
+double G = 2.62144 * pow(10, -6);
+float dt = 100.0f; // seconds spent per frame
 
 
 struct Planet {
@@ -49,6 +50,7 @@ struct Planet {
             float ry = planet.y - y;
             float r = std::sqrt(pow(rx, 2) + pow(ry, 2));
 
+            //avoid division by 0 problem
             if (r < 1.0f) r = 1.0f; 
 
             float a = (G * planet.mass / pow(r, 2));
@@ -96,8 +98,10 @@ int main() {
     int ScreenWidth = 1600;
     int ScreenHeight = 1000;
 
+    float asteroid_orbital_velocity = pow(G * 60000/ 200, 0.5);
+
     Planet earth("Earth", 6 * pow(10, 4), 100, BLUE, 800, 500, 0, 0);
-    Planet asteroid("101", 5 * pow(10, -18), 20, WHITE, 1000, 900, 0, 0);
+    Planet asteroid("101", 5 * pow(10, -18), 20, WHITE, 800, 300, asteroid_orbital_velocity, 0);
 
 
     InitWindow(ScreenWidth, ScreenHeight, "Raylib");
