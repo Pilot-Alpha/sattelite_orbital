@@ -6,9 +6,9 @@
 #include <string>
 
 // declaring constants
-double pi = std::numbers::pi;
-double G = 2.62144 * pow(10, -6);
-float dt = 100.0f; // seconds spent per frame
+const double pi = std::numbers::pi;
+const double G = 2.62144 * pow(10, -6);
+const float dt = 100.0f; // seconds spent per frame
 
 
 struct Planet {
@@ -17,10 +17,7 @@ struct Planet {
         long double radius;
         double density;
         Color color;
-        float x;
-        float y;
-        float vx;
-        float vy;
+
         std::tuple<float, float> r;
         std::tuple<float, float> v;
 
@@ -30,10 +27,7 @@ struct Planet {
             radius = Radius;
             density = mass / ((4.0f/3.0f) * pi * pow(radius, 3));
             color = Color;
-            x = X;
-            y = Y;
-            vx = Vx;
-            vy = Vy;
+
             r = {X, Y};
             v = {Vx, Vy};
         }
@@ -41,21 +35,23 @@ struct Planet {
 
 
         void DrawPlanet() {
+            auto [x, y] = r;
             DrawCircle(x, y, radius, color);
         }
 
 
         auto CalculateAcceleration(const Planet& planet) {
-            float rx = planet.x - x;
-            float ry = planet.y - y;
-            float r = std::sqrt(pow(rx, 2) + pow(ry, 2));
+            auto [x, y] = r;
+            float rx = std::get<0>(planet.r) - x;
+            float ry = std::get<1>(planet.r) - y;
+            float r_net = std::sqrt(pow(rx, 2) + pow(ry, 2));
 
-            //avoid division by 0 problem
-            if (r < 1.0f) r = 1.0f; 
+            // avoid division by 0 problem
+            if (r_net < 1.0f) r_net = 1.0f; 
 
-            float a = (G * planet.mass / pow(r, 2));
-            float sin_theta = ry/r;
-            float cos_theta = rx/r;
+            float a = (G * planet.mass / pow(r_net, 2));
+            float sin_theta = ry/r_net;
+            float cos_theta = rx/r_net;
             float ax = a * cos_theta;
             float ay = a * sin_theta;
             return std::make_tuple(ax, ay);
@@ -85,11 +81,7 @@ struct Planet {
             auto a = CalculateAcceleration(planet);
             v = CalculateVelocity(v, a);
             r = CalculateDisplacement(r, v);
-            x = std::get<0>(r);
-            y = std::get<1>(r);
-            // sync the new velocity back
-            vx = std::get<0>(v);
-            vy = std::get<1>(v);
+            
         }
     };
 
